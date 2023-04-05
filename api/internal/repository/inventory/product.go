@@ -45,13 +45,9 @@ func (i impl) GetAllProducts(ctx context.Context) (dbmodel.ProductSlice, error) 
 }
 
 func (i impl) GetProductDetails(ctx context.Context, pid int64) (model.Product, error) {
-	exists, err := dbmodel.Products(
-		dbmodel.ProductWhere.ID.EQ(pid),
-	).Exists(ctx, i.db)
+	p, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(pid)).One(ctx, i.db)
 
 	if err != nil {
-		return model.Product{}, pkgerrors.WithStack(err)
-	} else if !exists {
 		return model.Product{}, &httpserver.Error{
 			Status: http.StatusBadRequest,
 			Code: "bad_request",
@@ -59,20 +55,14 @@ func (i impl) GetProductDetails(ctx context.Context, pid int64) (model.Product, 
 		}
 	}
 
-	product, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(pid)).One(ctx, i.db)
-
-	if err != nil {
-		return model.Product{}, pkgerrors.WithStack(err)
-	}
-
 	return model.Product{
-		ID:          product.ID,
-		Name:        product.Name,
-		Description: product.Description,
-		Price:       product.Price,
-		Status:      model.ProductStatus(product.Status),
-		CreatedAt:   product.CreatedAt,
-		UpdatedAt:   product.UpdatedAt,
+		ID:          p.ID,
+		Name:        p.Name,
+		Description: p.Description,
+		Price:       p.Price,
+		Status:      model.ProductStatus(p.Status),
+		CreatedAt:   p.CreatedAt,
+		UpdatedAt:   p.UpdatedAt,
 	}, nil
 }
 
@@ -96,4 +86,33 @@ func (i impl) DeleteProduct(ctx context.Context, pid int64) (bool, error) {
 	}
 
 	return true, nil
+}
+
+
+func (i impl) UpdateProduct(ctx context.Context, m model.Product, pid int64) (model.Product, error) {
+	p, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(pid)).One(ctx, i.db)
+
+	if err != nil {
+		return model.Product{}, &httpserver.Error{
+			Status: http.StatusBadRequest,
+			Code: "bad_request",
+			Desc: "Product not found",
+		}
+	}
+
+	p.Name = m.Name
+	p.Description = m.Description
+	p.Price = m.Price
+
+	if _, err := p.Update(ctx, i.db, boil.Infer()); err != nil {
+		return model.Product{}, pkgerrors.WithStack(err)
+	}
+
+	updatedProduct, err := i.GetProductDetails(ctx, pid)
+
+	if err != nil {
+		return model.Product{}, pkgerrors.WithStack(err)
+	}
+
+	return updatedProduct, nil
 }

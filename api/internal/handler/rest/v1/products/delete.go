@@ -1,7 +1,6 @@
 package products
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
@@ -12,9 +11,9 @@ import (
 func (h Handler) Delete() http.HandlerFunc {
 	return httpserver.HandlerErr(func(w http.ResponseWriter, r *http.Request) error {
 		ctx := r.Context()
-		productID := chi.URLParam(r, "productID")
+		pid := chi.URLParam(r, "productID")
 
-		ID, err := strconv.ParseInt(productID, 0, 0)
+		ID, err := strconv.ParseInt(pid, 0, 0)
 
 		if err != nil {
 			return &httpserver.Error{

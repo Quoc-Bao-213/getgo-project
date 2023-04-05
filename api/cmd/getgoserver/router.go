@@ -37,6 +37,7 @@ func (rtr router) public(r chi.Router) {
 			r.Get(pattern, products.New(rtr.productCtrl).GetAllProducts())
 			r.Get(pattern + "{productID}", products.New(rtr.productCtrl).GetProductDetails())
 			r.Delete(pattern + "{productID}", products.New(rtr.productCtrl).Delete())
+			r.Put(pattern + "{productID}", products.New(rtr.productCtrl).Update())
 		})
 	})
 }

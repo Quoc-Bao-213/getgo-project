@@ -14,6 +14,7 @@ type Repository interface {
 	GetAllProducts(context.Context) (dbmodel.ProductSlice, error)
 	GetProductDetails(context.Context, int64) (model.Product, error)
 	DeleteProduct(context.Context, int64) (bool, error)
+	UpdateProduct(context.Context, model.Product, int64) (model.Product, error)
 }
 
 func New(db *sql.DB) Repository {

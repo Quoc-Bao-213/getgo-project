@@ -4,6 +4,6 @@ import (
 	"context"
 )
 
-func (i impl) Delete(ctx context.Context, productID int64) (bool, error) {
-	return i.repo.Inventory().DeleteProduct(ctx, productID)
+func (i impl) Delete(ctx context.Context, pid int64) (bool, error) {
+	return i.repo.Inventory().DeleteProduct(ctx, pid)
 }

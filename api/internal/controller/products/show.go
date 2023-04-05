@@ -7,6 +7,6 @@ import (
 )
 
 // Create creates new product
-func (i impl) GetProductDetails(ctx context.Context, productID int64) (model.Product, error) {
-	return i.repo.Inventory().GetProductDetails(ctx, productID)
+func (i impl) GetProductDetails(ctx context.Context, pid int64) (model.Product, error) {
+	return i.repo.Inventory().GetProductDetails(ctx, pid)
 }

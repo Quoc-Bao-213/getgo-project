@@ -1,28 +1,28 @@
 package products
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
+	"github.com/Quoc-Bao-213/getgo-project/api/internal/controller/products"
 	"github.com/Quoc-Bao-213/getgo-project/api/internal/httpserver"
 	"github.com/go-chi/chi/v5"
 )
 
-func (h Handler) GetProductDetails() http.HandlerFunc {
+// Create creates new product
+func (h Handler) Update() http.HandlerFunc {
 	return httpserver.HandlerErr(func(w http.ResponseWriter, r *http.Request) error {
 		ctx := r.Context()
+		input := products.UpdateInput{}
 		pid := chi.URLParam(r, "productID")
-		ID, err := strconv.ParseInt(pid, 0, 0)
+		ID, _ := strconv.ParseInt(pid, 0, 0)
 
-		if err != nil {
-			return &httpserver.Error{
-				Status: http.StatusBadRequest,
-				Code: "bad_request",
-				Desc: "Invalid product ID",
-			}
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			return err
 		}
 
-		resp, err := h.productCtrl.GetProductDetails(ctx, ID)
+		resp, err := h.productCtrl.Update(ctx, input, ID)
 		if err != nil {
 			return err
 		}
