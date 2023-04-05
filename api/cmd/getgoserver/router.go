@@ -20,7 +20,7 @@ func (rtr router) public(r chi.Router) {
 	prefix := "/api/public"
 
 	r.Group(func(r chi.Router) {
-		r.Get(prefix+"/ping", func(w http.ResponseWriter, r *http.Request) {
+		r.Get(prefix + "/ping", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("hello world!!"))
 		})
 	})
@@ -35,7 +35,8 @@ func (rtr router) public(r chi.Router) {
 
 			r.Post(pattern, products.New(rtr.productCtrl).Create())
 			r.Get(pattern, products.New(rtr.productCtrl).GetAllProducts())
-			r.Put(pattern+"{productID}", products.New(rtr.productCtrl).GetProductDetails())
+			r.Get(pattern + "{productID}", products.New(rtr.productCtrl).GetProductDetails())
+			r.Delete(pattern + "{productID}", products.New(rtr.productCtrl).Delete())
 		})
 	})
 }

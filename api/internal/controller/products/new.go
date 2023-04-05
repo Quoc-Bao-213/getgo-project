@@ -13,6 +13,7 @@ type Controller interface {
 	Create(context.Context, CreateInput) (model.Product, error)
 	GetAllProducts(context.Context) (dbmodel.ProductSlice, error)
 	GetProductDetails(context.Context, int64) (model.Product, error)
+	Delete(context.Context, int64) (bool, error)
 }
 
 // New returns an implementation instance which satisfying Controller

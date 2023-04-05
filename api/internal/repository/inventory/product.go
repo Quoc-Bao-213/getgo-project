@@ -44,9 +44,9 @@ func (i impl) GetAllProducts(ctx context.Context) (dbmodel.ProductSlice, error) 
 	return o, err
 }
 
-func (i impl) GetProductDetails(ctx context.Context, productID int64) (model.Product, error) {
+func (i impl) GetProductDetails(ctx context.Context, pid int64) (model.Product, error) {
 	exists, err := dbmodel.Products(
-		dbmodel.ProductWhere.ID.EQ(productID),
+		dbmodel.ProductWhere.ID.EQ(pid),
 	).Exists(ctx, i.db)
 
 	if err != nil {
@@ -59,7 +59,7 @@ func (i impl) GetProductDetails(ctx context.Context, productID int64) (model.Pro
 		}
 	}
 
-	product, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(productID)).One(ctx, i.db)
+	product, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(pid)).One(ctx, i.db)
 
 	if err != nil {
 		return model.Product{}, pkgerrors.WithStack(err)
@@ -74,4 +74,26 @@ func (i impl) GetProductDetails(ctx context.Context, productID int64) (model.Pro
 		CreatedAt:   product.CreatedAt,
 		UpdatedAt:   product.UpdatedAt,
 	}, nil
+}
+
+func (i impl) DeleteProduct(ctx context.Context, pid int64) (bool, error) {
+	exists, _ := dbmodel.Products(
+		dbmodel.ProductWhere.ID.EQ(pid),
+	).Exists(ctx, i.db)
+
+	if !exists {
+		return false, &httpserver.Error{
+			Status: http.StatusBadRequest,
+			Code: "bad_request",
+			Desc: "Product not found",
+		}
+	}
+
+	_, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(pid)).DeleteAll(ctx, i.db)
+
+	if err != nil {
+		return false, pkgerrors.WithStack(err)
+	}
+
+	return true, nil
 }
