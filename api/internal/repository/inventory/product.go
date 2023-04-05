@@ -2,7 +2,9 @@ package inventory
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/Quoc-Bao-213/getgo-project/api/internal/httpserver"
 	"github.com/Quoc-Bao-213/getgo-project/api/internal/model"
 	"github.com/Quoc-Bao-213/getgo-project/api/internal/repository/dbmodel"
 	"github.com/Quoc-Bao-213/getgo-project/api/internal/repository/generator"
@@ -43,6 +45,20 @@ func (i impl) GetAllProducts(ctx context.Context) (dbmodel.ProductSlice, error) 
 }
 
 func (i impl) GetProductDetails(ctx context.Context, productID int64) (model.Product, error) {
+	exists, err := dbmodel.Products(
+		dbmodel.ProductWhere.ID.EQ(productID),
+	).Exists(ctx, i.db)
+
+	if err != nil {
+		return model.Product{}, pkgerrors.WithStack(err)
+	} else if !exists {
+		return model.Product{}, &httpserver.Error{
+			Status: http.StatusBadRequest,
+			Code: "bad_request",
+			Desc: "Product not found",
+		}
+	}
+
 	product, err := dbmodel.Products(dbmodel.ProductWhere.ID.EQ(productID)).One(ctx, i.db)
 
 	if err != nil {
