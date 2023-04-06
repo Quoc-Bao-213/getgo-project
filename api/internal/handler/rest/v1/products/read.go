@@ -6,7 +6,7 @@ import (
 	"github.com/Quoc-Bao-213/getgo-project/api/internal/httpserver"
 )
 
-// Create creates new product
+// Show all products
 func (h Handler) GetAllProducts() http.HandlerFunc {
 	return httpserver.HandlerErr(func(w http.ResponseWriter, r *http.Request) error {
 		ctx := r.Context()
